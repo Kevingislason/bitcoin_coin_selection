@@ -16,7 +16,7 @@ class OutputGroup():
 
     def __init__(
             self,
-            outputs=[],
+            outputs=None,
             from_me=True,
             value=0,
             depth=999,
@@ -26,7 +26,10 @@ class OutputGroup():
             fee=0,
             long_term_fee=0
     ):
-        self.outputs = outputs
+        if outputs:
+            self.outputs = outputs
+        else:
+            self.outputs = []
         self.from_me = from_me
         self.value = value
         self.depth = depth
@@ -44,6 +47,11 @@ class OutputGroup():
         self.from_me &= from_me
         self.value += output.effective_value
         self.depth = min(self.depth, depth)
+        # ancestors here express the number of ancestors the new coin will end up having, which is
+        # the sum, rather than the max; this will overestimate in the cases where multiple inputs
+        # have common ancestors
         self.ancestor_count += ancestor_count
+        # descendants is the count as seen from the top ancestor, not the descendants as seen from the
+        # coin itself; thus, this value is counted as the max, not the sum
         self.descendant_count = max(self.descendant_count, descendant_count)
         self.effective_value = self.value
