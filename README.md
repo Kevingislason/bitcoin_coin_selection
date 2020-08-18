@@ -1,4 +1,4 @@
-# bitcoin_utxo_selection
+# bitcoin_utxo_selection (WIP)
 
 Port of Bitcoin core UTXO selection algorithms (Branch and Bound, Knapsack) to Python <br>
 See:<br>
