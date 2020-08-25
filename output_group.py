@@ -1,5 +1,4 @@
 from typing import List
-
 from input_coin import InputCoin
 
 
@@ -55,3 +54,13 @@ class OutputGroup():
         # coin itself; thus, this value is counted as the max, not the sum
         self.descendant_count = max(self.descendant_count, descendant_count)
         self.effective_value = self.value
+
+    # Insert all the input coins in the given group into this group
+    def insert_group(self, output_group: "OutputGroup"):
+        for output in output_group.outputs:
+            self.insert(output,
+                        output_group.depth,
+                        output_group.from_me,
+                        output_group.ancestor_count,
+                        output_group.descendant_count
+                        )

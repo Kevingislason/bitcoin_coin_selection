@@ -2,24 +2,9 @@ from typing import List
 
 from change_constants import MAX_MONEY
 from output_group import OutputGroup
+from utils import assemble_output_set
 
 TOTAL_TRIES = 100000
-
-
-def assemble_output_set(best_selection: List[bool],
-                        utxo_pool: List[OutputGroup]) -> OutputGroup:
-    selected_outputs = OutputGroup()
-    for i, was_selected in enumerate(best_selection):
-        if was_selected:
-            output_group = utxo_pool[i]
-            for output in output_group.outputs:
-                selected_outputs.insert(output,
-                                        output_group.depth,
-                                        output_group.from_me,
-                                        output_group.ancestor_count,
-                                        output_group.descendant_count
-                                        )
-    return selected_outputs
 
 
 def select_coins_branch_and_bound(utxo_pool: List[OutputGroup],
