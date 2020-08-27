@@ -2,9 +2,9 @@ from typing import List, Tuple
 import math
 import pytest
 
-from change_constants import CENT, COIN, MIN_CHANGE
-from knapsack_solver import select_coins_knapsack_solver
+from selection_algorithms.knapsack_solver import select_coins_knapsack_solver
 from tests.fixtures import generate_utxo_pool
+from selection_types.change_constants import CENT, COIN, MIN_CHANGE
 
 
 RUN_TESTS = 100

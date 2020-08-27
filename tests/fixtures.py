@@ -2,27 +2,28 @@ from typing import List, Tuple
 
 import pytest
 
-from input_coin import InputCoin
-from output_group import OutputGroup
+from selection_types.input_coin import InputCoin
+from selection_types.output_group import OutputGroup
 
 
 @pytest.fixture
 def generate_utxo_pool():
-    def _generate_utxo_pool(amounts: List[int]) -> List[OutputGroup]:
+    def _generate_utxo_pool(
+        amounts: List[int],
+        short_term_fee_per_byte: int = 0,
+        long_term_fee_per_byte: int = 0
+    ) -> List[OutputGroup]:
         utxo_pool: List[OutputGroup] = []
         for amount in amounts:
             input_coin = InputCoin(
                 tx_hash="",
                 vout=0,
-                effective_value=amount
+                value=amount,
+                input_bytes=0
             )
-            output_group = OutputGroup()
-            output_group.insert(input_coin,
-                                depth=999,
-                                from_me=True,
-                                ancestor_count=1,
-                                descendant_count=1
-                                )
+            output_group = OutputGroup([input_coin])
+            output_group.set_fee(short_term_fee_per_byte,
+                                 long_term_fee_per_byte)
             utxo_pool.append(output_group)
         return utxo_pool
     return _generate_utxo_pool

@@ -2,13 +2,13 @@ import random
 
 from typing import List, Optional
 
-from change_constants import MIN_CHANGE
-from output_group import OutputGroup
-from utils import assemble_output_set
+from selection_types.change_constants import MIN_CHANGE
+from selection_types.selection_result import SelectionResult
+from selection_types.output_group import OutputGroup
 
 
 def approximate_best_subset(utxo_pool: List[OutputGroup], target_value: int,
-                            total_lower: int, iterations=1000) -> OutputGroup:
+                            total_lower: int, iterations=1000) -> SelectionResult:
 
     best_selection = [True for output_group in utxo_pool]
     best_value = total_lower
@@ -41,7 +41,7 @@ def approximate_best_subset(utxo_pool: List[OutputGroup], target_value: int,
                         total_value -= utxo_pool[i].value
                         included[i] = False
 
-    return assemble_output_set(best_selection, utxo_pool)
+    return SelectionResult.from_utxo_pool(best_selection, utxo_pool)
 
 
 def select_coins_knapsack_solver(utxo_pool: List[OutputGroup], target_value: int) -> OutputGroup:
@@ -55,9 +55,7 @@ def select_coins_knapsack_solver(utxo_pool: List[OutputGroup], target_value: int
 
     for output_group in utxo_pool:
         if output_group.value == target_value:
-            selected_outputs = OutputGroup()
-            selected_outputs.insert_group(output_group)
-            return selected_outputs
+            return SelectionResult([output_group])
         elif output_group.value < target_value + MIN_CHANGE:
             applicable_groups.append(output_group)
             total_lower += output_group.value
@@ -65,17 +63,12 @@ def select_coins_knapsack_solver(utxo_pool: List[OutputGroup], target_value: int
             lowest_larger = output_group
 
     if total_lower == target_value:
-        selected_outputs = OutputGroup()
-        for output_group in applicable_groups:
-            selected_outputs.insert_group(output_group)
-        return selected_outputs
+        return SelectionResult(applicable_groups)
     if total_lower < target_value:
         if not lowest_larger:
-            return OutputGroup()
+            return SelectionResult()
         else:
-            selected_outputs = OutputGroup()
-            selected_outputs.insert_group(lowest_larger)
-            return selected_outputs
+            return SelectionResult([lowest_larger])
 
     # Solve subset sum by stochastic approximation
     utxo_pool.sort(reverse=True)
@@ -97,7 +90,6 @@ def select_coins_knapsack_solver(utxo_pool: List[OutputGroup], target_value: int
             lowest_larger.value <= best_selection.value
         )
     ):
-        best_selection = OutputGroup()
-        best_selection.insert_group(lowest_larger)
+        best_selection = SelectionResult([lowest_larger])
 
     return best_selection

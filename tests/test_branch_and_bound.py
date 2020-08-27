@@ -2,11 +2,11 @@ from typing import List
 
 import pytest
 
-from branch_and_bound import select_coins_branch_and_bound
-from change_constants import CENT
+from selection_algorithms.branch_and_bound import select_coins_branch_and_bound
+from selection_types.change_constants import CENT
+from selection_types.input_coin import InputCoin
+from selection_types.output_group import OutputGroup
 from tests.fixtures import generate_utxo_pool, make_hard_case
-from input_coin import InputCoin
-from output_group import OutputGroup
 
 # todo: run tests with retries and repeats
 

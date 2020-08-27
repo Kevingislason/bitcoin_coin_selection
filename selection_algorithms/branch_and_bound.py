@@ -1,8 +1,8 @@
 from typing import List
 
-from change_constants import MAX_MONEY
-from output_group import OutputGroup
-from utils import assemble_output_set
+from selection_types.change_constants import MAX_MONEY
+from selection_types.output_group import OutputGroup
+from selection_types.selection_result import SelectionResult
 
 TOTAL_TRIES = 100000
 
@@ -10,7 +10,7 @@ TOTAL_TRIES = 100000
 def select_coins_branch_and_bound(utxo_pool: List[OutputGroup],
                                   target_value: int,
                                   cost_of_change: int,
-                                  not_input_fees: int) -> OutputGroup:
+                                  not_input_fees: int) -> SelectionResult:
 
     current_value = 0
     current_selection: List[bool] = []
@@ -22,7 +22,7 @@ def select_coins_branch_and_bound(utxo_pool: List[OutputGroup],
         current_available_value += output_group.effective_value
 
     if current_available_value < actual_target:
-        return OutputGroup()
+        return SelectionResult()
 
     utxo_pool.sort(reverse=True)
 
@@ -56,7 +56,7 @@ def select_coins_branch_and_bound(utxo_pool: List[OutputGroup],
                 best_selection = current_selection.copy()
                 best_waste = current_waste
                 if (best_waste == 0):
-                    return assemble_output_set(best_selection, utxo_pool)
+                    return SelectionResult.from_utxo_pool(best_selection, utxo_pool)
             # Remove the excess value as we will be selecting different coins now
             current_waste -= (current_value - actual_target)
             should_backtrack = True
@@ -101,8 +101,7 @@ def select_coins_branch_and_bound(utxo_pool: List[OutputGroup],
 
     # Check for solution
     if len(best_selection) == 0:
-        return OutputGroup()
+        return SelectionResult()
 
     # Set output set
-    return assemble_output_set(best_selection, utxo_pool)
-    # todo: take output group as a parameter
+    return SelectionResult.from_utxo_pool(best_selection, utxo_pool)
