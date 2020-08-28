@@ -9,11 +9,14 @@ from selection_types.change_constants import CENT, COIN, MIN_CHANGE
 
 RUN_TESTS = 100
 
+DEFAULT_NOT_INPUT_FEES = 0
+
 
 def test_knapsack_solver_insifficient_funds(generate_utxo_pool):
     utxo_pool = generate_utxo_pool([])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 1 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 1 * CENT, DEFAULT_NOT_INPUT_FEES)
 
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
@@ -22,7 +25,8 @@ def test_knapsack_solver_insifficient_funds(generate_utxo_pool):
 def test_knapsack_solver_single_coin_exact_match(generate_utxo_pool):
     utxo_pool = generate_utxo_pool([1 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 1 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 1 * CENT, DEFAULT_NOT_INPUT_FEES)
 
     assert len(selection.outputs) == 1
     assert selection.effective_value == 1 * CENT
@@ -31,7 +35,8 @@ def test_knapsack_solver_single_coin_exact_match(generate_utxo_pool):
 def test_knapsack_solver_two_coins_exact_match(generate_utxo_pool):
     utxo_pool = generate_utxo_pool([1 * CENT, 2 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 3 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 3 * CENT, DEFAULT_NOT_INPUT_FEES)
 
     assert len(selection.outputs) == 2
     assert selection.effective_value == 3 * CENT
@@ -41,7 +46,8 @@ def test_knapsack_solver_large_pool_exact_match_1(generate_utxo_pool):
     utxo_pool = generate_utxo_pool(
         [6 * CENT, 7 * CENT, 8 * CENT, 20 * CENT, 30 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 71 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 71 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 5
     assert selection.effective_value == 71 * CENT
 
@@ -50,7 +56,8 @@ def test_knapsack_solver_large_pool_insufficient_funds(generate_utxo_pool):
     utxo_pool = generate_utxo_pool(
         [6 * CENT, 7 * CENT, 8 * CENT, 20 * CENT, 30 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 72 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 72 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
 
@@ -59,7 +66,8 @@ def test_knapsack_solver_large_pool_single_large_coin_approx_match(generate_utxo
     utxo_pool = generate_utxo_pool(
         [6 * CENT, 7 * CENT, 8 * CENT, 20 * CENT, 30 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 16 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 16 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 1
     assert selection.effective_value == 20 * CENT
 
@@ -68,7 +76,8 @@ def test_knapsack_solver_large_pool_many_coins_approx_match(generate_utxo_pool):
     utxo_pool = generate_utxo_pool(
         [5 * CENT, 6 * CENT, 7 * CENT, 8 * CENT, 20 * CENT, 30 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 16 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 16 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 3
     assert selection.effective_value == 18 * CENT
 
@@ -77,7 +86,8 @@ def test_knapsack_solver_large_pool_single_large_coin_vs_many_coins_tie(generate
     utxo_pool = generate_utxo_pool(
         [5 * CENT, 6 * CENT, 7 * CENT, 8 * CENT, 18 * CENT, 20 * CENT, 30 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 16 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 16 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 1
     assert selection.effective_value == 18 * CENT
 
@@ -86,7 +96,8 @@ def test_knapsack_solver_large_pool_exact_match_2(generate_utxo_pool):
     utxo_pool = generate_utxo_pool(
         [5 * CENT, 6 * CENT, 7 * CENT, 8 * CENT, 18 * CENT, 20 * CENT, 30 * CENT])
 
-    selection = select_coins_knapsack_solver(utxo_pool, 11 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 11 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 2
     assert selection.effective_value == 11 * CENT
 
@@ -104,11 +115,13 @@ def test_knapsack_solver_smallest_larger_coin_used(generate_utxo_pool):
         2 * COIN,
         3 * COIN
     ])
-    selection = select_coins_knapsack_solver(utxo_pool, 95 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 95 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 1
     assert selection.effective_value == 1 * COIN
 
-    selection = select_coins_knapsack_solver(utxo_pool, 195 * CENT)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 195 * CENT, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 1
     assert selection.effective_value == 2 * COIN
 
@@ -122,7 +135,8 @@ def test_knapsack_solver_avoids_small_change_1(generate_utxo_pool):
         MIN_CHANGE * 5 / 10
     ])
 
-    selection = select_coins_knapsack_solver(utxo_pool, MIN_CHANGE)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, MIN_CHANGE, DEFAULT_NOT_INPUT_FEES)
     assert selection.effective_value == MIN_CHANGE
 
 
@@ -136,7 +150,8 @@ def test_knapsack_solver_avoids_small_change_2(generate_utxo_pool):
         1111 * MIN_CHANGE
     ])
 
-    selection = select_coins_knapsack_solver(utxo_pool, MIN_CHANGE)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, MIN_CHANGE, DEFAULT_NOT_INPUT_FEES)
     assert selection.effective_value == MIN_CHANGE
 
 
@@ -152,7 +167,8 @@ def test_knapsack_solver_avoids_small_change_3(generate_utxo_pool):
         1111 * MIN_CHANGE
     ])
 
-    selection = select_coins_knapsack_solver(utxo_pool, MIN_CHANGE)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, MIN_CHANGE, DEFAULT_NOT_INPUT_FEES)
     assert selection.effective_value == MIN_CHANGE
 
 
@@ -164,7 +180,8 @@ def test_knapsack_solver_avoids_small_change_4(generate_utxo_pool):
         1111 * MIN_CHANGE
     ])
 
-    selection = select_coins_knapsack_solver(utxo_pool, MIN_CHANGE)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, MIN_CHANGE, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 1
     assert selection.effective_value == 1111 * MIN_CHANGE
 
@@ -178,7 +195,8 @@ def test_knapsack_solver_avoids_small_change_5(generate_utxo_pool):
         1111 * MIN_CHANGE
     ])
 
-    selection = select_coins_knapsack_solver(utxo_pool, MIN_CHANGE)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, MIN_CHANGE, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 2
     assert selection.effective_value == MIN_CHANGE
 
@@ -191,7 +209,7 @@ def test_knapsack_solver_avoids_small_change_6(generate_utxo_pool):
     ])
 
     selection = select_coins_knapsack_solver(
-        utxo_pool, MIN_CHANGE * 10001 / 100)
+        utxo_pool, MIN_CHANGE * 10001 / 100, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 3
     assert selection.effective_value == MIN_CHANGE * 10105 / 100
 
@@ -204,7 +222,7 @@ def test_knapsack_solver_avoids_small_change_6(generate_utxo_pool):
     ])
 
     selection = select_coins_knapsack_solver(
-        utxo_pool, MIN_CHANGE * 9990 / 100)
+        utxo_pool, MIN_CHANGE * 9990 / 100, DEFAULT_NOT_INPUT_FEES)
     assert len(selection.outputs) == 2
     assert selection.effective_value == 101 * MIN_CHANGE
 
@@ -214,7 +232,8 @@ def test_knapsack_solver_avoids_small_change_6(generate_utxo_pool):
 
 def test_knapsack_solver_mt_gox(generate_utxo_pool):
     utxo_pool = generate_utxo_pool([50000 * COIN for i in range(20)])
-    selection = select_coins_knapsack_solver(utxo_pool, 500000 * COIN)
+    selection = select_coins_knapsack_solver(
+        utxo_pool, 500000 * COIN, DEFAULT_NOT_INPUT_FEES)
 
     assert len(selection.outputs) == 10
     assert selection.effective_value == 500000 * COIN
@@ -230,7 +249,8 @@ def test_knapsack_solver_many_inputs(generate_utxo_pool):
             [currnet_amount for i in range(MAX_INPUTS)])
 
         for i in range(100):
-            selection = select_coins_knapsack_solver(utxo_pool, 2000)
+            selection = select_coins_knapsack_solver(
+                utxo_pool, 2000, DEFAULT_NOT_INPUT_FEES)
 
             if currnet_amount - 2000 < MIN_CHANGE:
                 # needs more than one input
@@ -252,8 +272,10 @@ def test_knapsack_solver_randomness_1(generate_utxo_pool):
 
     for i in range(RUN_TESTS):
 
-        selection_1 = select_coins_knapsack_solver(utxo_pool, 50 * COIN)
-        selection_2 = select_coins_knapsack_solver(utxo_pool, 50 * COIN)
+        selection_1 = select_coins_knapsack_solver(
+            utxo_pool, 50 * COIN, DEFAULT_NOT_INPUT_FEES)
+        selection_2 = select_coins_knapsack_solver(
+            utxo_pool, 50 * COIN, DEFAULT_NOT_INPUT_FEES)
 
         assert selection_1.effective_value == selection_1.effective_value == 50 * COIN
         assert set(selection_1.outputs) != set(selection_2.outputs)
@@ -267,8 +289,10 @@ def test_knapsack_solver_randomness_2(generate_utxo_pool):
 
     for i in range(RUN_TESTS):
 
-        selection_1 = select_coins_knapsack_solver(utxo_pool, 90 * CENT)
-        selection_2 = select_coins_knapsack_solver(utxo_pool, 90 * CENT)
+        selection_1 = select_coins_knapsack_solver(
+            utxo_pool, 90 * CENT, DEFAULT_NOT_INPUT_FEES)
+        selection_2 = select_coins_knapsack_solver(
+            utxo_pool, 90 * CENT, DEFAULT_NOT_INPUT_FEES)
 
         assert selection_1.effective_value == selection_1.effective_value == COIN
         assert set(selection_1.outputs) != set(selection_2.outputs)
