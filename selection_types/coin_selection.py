@@ -12,7 +12,8 @@ class CoinSelection():
         SUCCESS = 0
         INSUFFICIENT_FUNDS = 1
         INSUFFICIENT_FUNDS_AFTER_FEES = 2
-        BRANCH_AND_BOUND_FAILURE = 3
+        ALGORITHM_FAILURE = 3
+        INVALID_SPEND = 4
 
     outcome: Outcome
     target: int
@@ -28,11 +29,8 @@ class CoinSelection():
         self.fee = 0
         self.outcome = outcome
         if selected_output_groups:
-            print(selected_output_groups, 1)
             for output_group in selected_output_groups:
-                print(output_group, 2)
                 for output in output_group.outputs:
-                    print(output, 2)
                     self.insert(output_group)
 
     @classmethod
@@ -44,8 +42,12 @@ class CoinSelection():
         return cls(None, cls.Outcome.INSUFFICIENT_FUNDS_AFTER_FEES)
 
     @classmethod
-    def branch_and_bound_failure(cls):
-        return cls(None, cls.Outcome.INSUFFICIENT_FUNDS_AFTER_FEES)
+    def algorithm_failure(cls):
+        return cls(None, cls.Outcome.ALGORITHM_FAILURE)
+
+    @classmethod
+    def invalid_spend(cls):
+        return cls(None, cls.Outcome.INVALID_SPEND)
 
     @classmethod
     def from_utxo_pool(cls, best_selection: List[bool], utxo_pool: List[OutputGroup]):

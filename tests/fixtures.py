@@ -18,8 +18,8 @@ def generate_utxo_pool():
             input_coin = InputCoin(
                 tx_hash="",
                 vout=0,
-                value=amount,
-                input_bytes=0
+                value=int(amount),
+                input_bytes=100
             )
             output_group = OutputGroup([input_coin])
             output_group.set_fee(short_term_fee_per_byte,
