@@ -10,13 +10,13 @@ from selection_types.output_group import OutputGroup
 from utils.check_for_insufficient_funds import check_for_insufficient_funds
 
 
-def approximate_best_subset(utxo_pool: List[OutputGroup], actual_target: int,
+def approximate_best_subset(utxo_pool: List[OutputGroup], target_value: int,
                             total_lower: int, iterations=1000) -> CoinSelection:
     best_selection = [True for output_group in utxo_pool]
     best_value = total_lower
 
     for iteration_number in range(iterations):
-        if best_value == actual_target:
+        if best_value == target_value:
             break
         included = [False for output_group in utxo_pool]
         total_value = 0
@@ -35,7 +35,7 @@ def approximate_best_subset(utxo_pool: List[OutputGroup], actual_target: int,
                 if (random.choice([True, False]) if pass_number == 0 else not included[i]):
                     total_value += utxo_pool[i].effective_value
                     included[i] = True
-                    if total_value >= actual_target:
+                    if total_value >= target_value:
                         reached_target = True
                         if total_value < best_value:
                             best_value = total_value
@@ -47,16 +47,9 @@ def approximate_best_subset(utxo_pool: List[OutputGroup], actual_target: int,
 
 
 def select_coins_knapsack_solver(
-        utxo_pool: List[OutputGroup], target_value: int, not_input_fees: int) -> CoinSelection:
+        utxo_pool: List[OutputGroup], target_value: int) -> CoinSelection:
 
-    actual_target = target_value + not_input_fees
-
-    insufficient_funds = check_for_insufficient_funds(
-        utxo_pool, target_value, not_input_fees)
-    if insufficient_funds:
-        return insufficient_funds
-
-    # lowest output larger than actual_target
+    # lowest output group larger than target_value
     lowest_larger: Optional[OutputGroup] = None
     applicable_groups: List[OutputGroup] = []
     total_lower = 0
@@ -64,37 +57,37 @@ def select_coins_knapsack_solver(
     random.shuffle(utxo_pool)
 
     for output_group in utxo_pool:
-        if output_group.effective_value == actual_target:
+        if output_group.effective_value == target_value:
             return CoinSelection([output_group])
 
-        elif output_group.effective_value < actual_target + MIN_CHANGE:
+        elif output_group.effective_value < target_value + MIN_CHANGE:
             applicable_groups.append(output_group)
             total_lower += output_group.effective_value
 
         elif not lowest_larger or output_group.effective_value < lowest_larger.effective_value:
             lowest_larger = output_group
 
-    if total_lower == actual_target:
+    if total_lower == target_value:
         return CoinSelection(applicable_groups)
 
-    if total_lower < actual_target:
+    if total_lower < target_value:
         return CoinSelection([lowest_larger])
 
     # Solve subset sum by stochastic approximation
     utxo_pool.sort(reverse=True)
     best_selection = approximate_best_subset(
-        applicable_groups, actual_target, total_lower
+        applicable_groups, target_value, total_lower
     )
-    if best_selection.effective_value != actual_target and total_lower >= actual_target + MIN_CHANGE:
+    if best_selection.effective_value != target_value and total_lower >= target_value + MIN_CHANGE:
         best_selection = approximate_best_subset(
-            applicable_groups, actual_target + MIN_CHANGE, total_lower
+            applicable_groups, target_value + MIN_CHANGE, total_lower
         )
     # If we have a bigger coin and (either the stochastic approximation didn't find
     # a good solution, or the next bigger coin is closer), return the bigger coin
     if lowest_larger and (
         (
-            best_selection.effective_value != actual_target
-            and best_selection.effective_value < actual_target + MIN_CHANGE
+            best_selection.effective_value != target_value
+            and best_selection.effective_value < target_value + MIN_CHANGE
         )
         or
         (
