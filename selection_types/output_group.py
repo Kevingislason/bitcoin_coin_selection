@@ -49,7 +49,3 @@ class OutputGroup():
     def insert(self, output: InputCoin):
         self.outputs.append(output)
         self.value += output.value
-
-    def insert_group(self, output_group: "OutputGroup"):
-        for output in output_group.outputs:
-            self.insert(output)
