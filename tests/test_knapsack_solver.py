@@ -11,17 +11,6 @@ from selection_types.coin_selection import CoinSelection
 RUN_TESTS = 100
 
 
-def test_knapsack_solver_insifficient_funds(generate_utxo_pool):
-    utxo_pool = generate_utxo_pool([])
-
-    selection = select_coins_knapsack_solver(
-        utxo_pool, 1 * CENT)
-
-    assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
-    assert len(selection.outputs) == 0
-    assert selection.effective_value == 0
-
-
 def test_knapsack_solver_single_coin_exact_match(generate_utxo_pool):
     utxo_pool = generate_utxo_pool([1 * CENT])
 

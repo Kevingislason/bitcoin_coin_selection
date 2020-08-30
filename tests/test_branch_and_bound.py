@@ -32,7 +32,7 @@ def test_branch_and_bound_exact_match_single_coin(generate_utxo_pool, target_amo
     ])
 
     selection = select_coins_branch_and_bound(
-        utxo_pool, target_amount, 0.5 * CENT, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, target_amount, 0.5 * CENT)
 
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 1
@@ -48,7 +48,7 @@ def test_branch_and_bound_insufficient_funds(generate_utxo_pool):
     ])
 
     selection = select_coins_branch_and_bound(
-        utxo_pool, 11 * CENT, 0.5 * CENT, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, 11 * CENT, 0.5 * CENT)
 
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
@@ -65,7 +65,7 @@ def test_branch_and_bound_expensive_change(generate_utxo_pool):
     ])
 
     selection = select_coins_branch_and_bound(
-        utxo_pool, 0.9 * CENT, 0.5 * CENT, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, 0.9 * CENT, 0.5 * CENT)
 
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 1
@@ -82,7 +82,7 @@ def test_branch_and_bound_cheap_change_failure(generate_utxo_pool):
     ])
 
     selection = select_coins_branch_and_bound(
-        utxo_pool, 0.9 * CENT, 0, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, 0.9 * CENT, 0)
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
@@ -98,7 +98,7 @@ def test_branch_and_bound_exact_match_multiple_coins(generate_utxo_pool):
     ])
 
     selection = select_coins_branch_and_bound(
-        utxo_pool, 10 * CENT, 0.5 * CENT, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, 10 * CENT, 0.5 * CENT)
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 3
     assert selection.effective_value == 10 * CENT
@@ -122,7 +122,7 @@ def test_branch_and_bound_failure_no_match(generate_utxo_pool):
     ])
 
     selection = select_coins_branch_and_bound(
-        utxo_pool, 0.25 * CENT, 0.5 * CENT, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, 0.25 * CENT, 0.5 * CENT)
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
@@ -131,13 +131,13 @@ def test_branch_and_bound_failure_no_match(generate_utxo_pool):
 def test_branch_and_bound_iteration_exhaustion(make_hard_case):
     target_value, utxo_pool = make_hard_case(17)
     selection = select_coins_branch_and_bound(
-        utxo_pool, target_value, 0, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, target_value, 0)
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
 
     target_value, utxo_pool = make_hard_case(14)
     selection = select_coins_branch_and_bound(
-        utxo_pool, target_value, 0, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, target_value, 0)
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) > 0
 
@@ -152,7 +152,7 @@ def test_branch_and_bound_early_bailout_optimization(generate_utxo_pool):
         [5 * CENT for i in range(50000)]
     )
     selection = select_coins_branch_and_bound(
-        utxo_pool, 30 * CENT, 5000, DEFAULT_NOT_INPUT_FEES)
+        utxo_pool, 30 * CENT, 5000)
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 5
     assert selection.effective_value == 30 * CENT
@@ -164,7 +164,7 @@ def test_branch_and_bound_consistently_fails_impossible_case(generate_utxo_pool)
     )
     for i in range(100):
         selection = select_coins_branch_and_bound(
-            utxo_pool, 1 * CENT, 2 * CENT, DEFAULT_NOT_INPUT_FEES)
+            utxo_pool, 1 * CENT, 2 * CENT)
         assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
         assert len(selection.outputs) == 0
         assert selection.effective_value == 0
