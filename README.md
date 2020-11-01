@@ -2,6 +2,10 @@
 
 Port of Bitcoin core coin selection logic to Python <br>
 
+# Installation
+
+```pip install bitcoin_coin_selection```
+
 # Context
 
 Bitcoin core coin selection logic:<br>
