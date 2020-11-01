@@ -2,12 +2,12 @@ from typing import List
 
 import pytest
 
-from selection_algorithms.branch_and_bound import select_coins_branch_and_bound
-from selection_types.change_constants import CENT
-from selection_types.coin_selection import CoinSelection
-from selection_types.input_coin import InputCoin
-from selection_types.output_group import OutputGroup
-from tests.fixtures import generate_utxo_pool, make_hard_case
+from bitcoin_coin_selection.selection_algorithms.branch_and_bound import select_coins_branch_and_bound
+from bitcoin_coin_selection.selection_types.change_constants import CENT
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_types.input_coin import InputCoin
+from bitcoin_coin_selection.selection_types.output_group import OutputGroup
+from bitcoin_coin_selection.tests.fixtures import generate_utxo_pool, make_hard_case
 
 # todo: run tests with retries and repeats
 # todo: test cases for non-zero npon-input fees

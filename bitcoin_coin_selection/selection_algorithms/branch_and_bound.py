@@ -1,8 +1,8 @@
 from typing import List
 
-from selection_types.change_constants import MAX_MONEY
-from selection_types.output_group import OutputGroup
-from selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_types.change_constants import MAX_MONEY
+from bitcoin_coin_selection.selection_types.output_group import OutputGroup
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
 
 TOTAL_TRIES = 100000
 

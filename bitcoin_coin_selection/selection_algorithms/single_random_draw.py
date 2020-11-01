@@ -1,9 +1,9 @@
 import random
 from typing import List
 
-from selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
 
-from selection_types.output_group import OutputGroup
+from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 
 
 def select_coins_single_random_draw(

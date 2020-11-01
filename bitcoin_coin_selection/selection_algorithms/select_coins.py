@@ -1,11 +1,11 @@
 from typing import List
 
-from selection_algorithms.branch_and_bound import select_coins_branch_and_bound
-from selection_algorithms.knapsack_solver import select_coins_knapsack_solver
-from selection_algorithms.single_random_draw import select_coins_single_random_draw
-from selection_types.change_constants import MAX_MONEY
-from selection_types.output_group import OutputGroup
-from selection_types.coin_selection import (
+from bitcoin_coin_selection.selection_algorithms.branch_and_bound import select_coins_branch_and_bound
+from bitcoin_coin_selection.selection_algorithms.knapsack_solver import select_coins_knapsack_solver
+from bitcoin_coin_selection.selection_algorithms.single_random_draw import select_coins_single_random_draw
+from bitcoin_coin_selection.selection_types.change_constants import MAX_MONEY
+from bitcoin_coin_selection.selection_types.output_group import OutputGroup
+from bitcoin_coin_selection.selection_types.coin_selection import (
     CoinSelection
 )
 

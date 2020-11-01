@@ -1,10 +1,10 @@
 from typing import List
 import pytest
 
-from selection_algorithms.single_random_draw import select_coins_single_random_draw
-from tests.fixtures import generate_utxo_pool
-from selection_types.change_constants import CENT
-from selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_algorithms.single_random_draw import select_coins_single_random_draw
+from bitcoin_coin_selection.tests.fixtures import generate_utxo_pool
+from bitcoin_coin_selection.selection_types.change_constants import CENT
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
 
 
 RUN_TESTS = 100

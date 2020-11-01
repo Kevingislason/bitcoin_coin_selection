@@ -1,10 +1,10 @@
 from typing import List, Tuple
 import pytest
 
-from selection_algorithms.select_coins import select_coins
-from tests.fixtures import generate_utxo_pool
-from selection_types.coin_selection import CoinSelection
-from selection_types.change_constants import CENT, COIN, MIN_CHANGE
+from bitcoin_coin_selection.selection_algorithms.select_coins import select_coins
+from bitcoin_coin_selection.tests.fixtures import generate_utxo_pool
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_types.change_constants import CENT, COIN, MIN_CHANGE
 
 
 def test_insufficient_funds_1(generate_utxo_pool):

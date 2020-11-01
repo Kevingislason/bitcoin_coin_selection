@@ -2,8 +2,8 @@ from typing import List, Tuple
 
 import pytest
 
-from selection_types.input_coin import InputCoin
-from selection_types.output_group import OutputGroup
+from bitcoin_coin_selection.selection_types.input_coin import InputCoin
+from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 
 
 @pytest.fixture

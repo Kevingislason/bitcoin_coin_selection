@@ -2,10 +2,10 @@ from typing import List, Tuple
 import math
 import pytest
 
-from selection_algorithms.knapsack_solver import select_coins_knapsack_solver
-from tests.fixtures import generate_utxo_pool
-from selection_types.change_constants import CENT, COIN, MIN_CHANGE
-from selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_algorithms.knapsack_solver import select_coins_knapsack_solver
+from bitcoin_coin_selection.tests.fixtures import generate_utxo_pool
+from bitcoin_coin_selection.selection_types.change_constants import CENT, COIN, MIN_CHANGE
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
 
 
 RUN_TESTS = 100

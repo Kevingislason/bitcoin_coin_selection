@@ -1,5 +1,5 @@
 from typing import List
-from selection_types.input_coin import InputCoin
+from bitcoin_coin_selection.selection_types.input_coin import InputCoin
 
 # See https://github.com/bitcoin/bitcoin/pull/12257
 """
@@ -17,8 +17,9 @@ class OutputGroup():
     effective_value: int
     fee: int
     long_term_fee: int
+    address: str
 
-    def __init__(self, outputs=None):
+    def __init__(self, outputs: List[InputCoin] = None, address: str = None):
         self.effective_value = None
         self.fee = None
         self.long_term_fee = None

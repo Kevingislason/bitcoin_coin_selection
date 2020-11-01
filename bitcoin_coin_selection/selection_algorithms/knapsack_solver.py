@@ -2,11 +2,10 @@ import random
 
 from typing import List, Optional
 
-from selection_types.change_constants import MIN_CHANGE
-from selection_types.coin_selection import (
-    CoinSelection
-)
-from selection_types.output_group import OutputGroup
+from bitcoin_coin_selection.selection_types.change_constants import MIN_CHANGE
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
+
+from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 
 
 DEFAULT_ITERATIONS = 1000
