@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import pytest
 
-from select_coins import select_coins
+from selection_algorithms.select_coins import select_coins
 from tests.fixtures import generate_utxo_pool
 from selection_types.coin_selection import CoinSelection
 from selection_types.change_constants import CENT, COIN, MIN_CHANGE
