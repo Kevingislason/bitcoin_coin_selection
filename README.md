@@ -1,6 +1,6 @@
-# bitcoin_utxo_selection
+# bitcoin_coin_selection
 
-Port of Bitcoin core UTXO selection logic to Python <br>
+Port of Bitcoin core coin selection logic to Python <br>
 
 # Context
 
