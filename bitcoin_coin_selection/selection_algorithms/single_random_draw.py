@@ -16,6 +16,6 @@ def select_coins_single_random_draw(
         selected_value += output_group.effective_value
         selected_output_groups.append(output_group)
         if selected_value >= target_value:
-            return CoinSelection(selected_output_groups)
+            return CoinSelection(target_value, selected_output_groups)
 
-    return CoinSelection.algorithm_failure()
+    return CoinSelection.algorithm_failure(target_value)

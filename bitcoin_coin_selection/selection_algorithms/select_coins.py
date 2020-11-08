@@ -21,13 +21,13 @@ def select_coins(utxo_pool: List[OutputGroup],
 
     # Validate target value isn't something silly
     if target_value == 0 or target_value > MAX_MONEY:
-        return CoinSelection.invalid_spend()
+        return CoinSelection.invalid_spend(target_value)
 
     # Check for insufficient funds
     total_value = int(sum(
         [output_group.value for output_group in utxo_pool]))
     if total_value < target_value:
-        return CoinSelection.insufficient_funds()
+        return CoinSelection.insufficient_funds(target_value)
 
     # Calculate fees spending any given utxo would incur
     for outut_group in utxo_pool:
@@ -40,7 +40,7 @@ def select_coins(utxo_pool: List[OutputGroup],
     total_effective_value = int(sum(
         [output_group.effective_value for output_group in utxo_pool]))
     if total_effective_value < target_after_fixed_fees:
-        return CoinSelection.insufficient_funds_after_fees()
+        return CoinSelection.insufficient_funds_after_fees(target_value)
 
     # Calculate cost of change (input to branch and bound)
     cost_of_creating_change = short_term_fee_per_byte * change_output_size_in_bytes

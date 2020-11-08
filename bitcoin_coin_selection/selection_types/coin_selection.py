@@ -16,51 +16,61 @@ class CoinSelection():
         INVALID_SPEND = 4
 
     outcome: Outcome
-    target: int
     outputs: List[InputCoin]
-    value: int
+    target_value: int
     effective_value: int
+    value: int
+    change_value: int
     fee: int
 
-    def __init__(self, selected_output_groups: List[OutputGroup] = None, outcome=Outcome.SUCCESS):
+    def __init__(self,
+                 target_value: int,
+                 selected_output_groups: List[OutputGroup] = None,
+                 outcome=Outcome.SUCCESS):
+        self.target_value = target_value
         self.outputs = []
-        self.value = 0
         self.effective_value = 0
+        self.value = 0
         self.fee = 0
         self.outcome = outcome
         if selected_output_groups:
             for output_group in selected_output_groups:
                 for output in output_group.outputs:
                     self.insert(output)
+        self.change_value = self.value - self.target_value - self.fee
 
     @classmethod
-    def insufficient_funds(cls):
-        return cls(None, cls.Outcome.INSUFFICIENT_FUNDS)
+    def insufficient_funds(cls, target_value: int):
+        return cls(target_value, None, cls.Outcome.INSUFFICIENT_FUNDS)
 
     @classmethod
-    def insufficient_funds_after_fees(cls):
-        return cls(None, cls.Outcome.INSUFFICIENT_FUNDS_AFTER_FEES)
+    def insufficient_funds_after_fees(cls, target_value: int):
+        return cls(target_value, None, cls.Outcome.INSUFFICIENT_FUNDS_AFTER_FEES)
 
     @classmethod
-    def algorithm_failure(cls):
-        return cls(None, cls.Outcome.ALGORITHM_FAILURE)
+    def algorithm_failure(cls, target_value: int):
+        return cls(target_value, None, cls.Outcome.ALGORITHM_FAILURE)
 
     @classmethod
-    def invalid_spend(cls):
-        return cls(None, cls.Outcome.INVALID_SPEND)
+    def invalid_spend(cls, target_value: int):
+        return cls(target_value, None, cls.Outcome.INVALID_SPEND)
 
     @classmethod
-    def from_utxo_pool(cls, best_selection: List[bool], utxo_pool: List[OutputGroup]):
+    def from_utxo_pool(cls,
+                       target_value: int,
+                       best_selection: List[bool],
+                       utxo_pool: List[OutputGroup]):
+
         selected_groups = []
         for i, was_selected in enumerate(best_selection):
             if was_selected:
                 selected_group = utxo_pool[i]
                 selected_groups.append(selected_group)
 
-        return cls(selected_groups)
+        return cls(target_value, selected_groups)
 
     def insert(self, output: InputCoin):
         self.outputs.append(output)
-        self.value += output.value
         self.effective_value += output.effective_value
+        self.value += output.value
         self.fee += output.fee

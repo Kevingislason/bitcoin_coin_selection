@@ -46,7 +46,7 @@ def select_coins_branch_and_bound(utxo_pool: List[OutputGroup], target_value: in
                 best_selection = current_selection.copy()
                 best_waste = current_waste
                 if (best_waste == 0):
-                    return CoinSelection.from_utxo_pool(best_selection, utxo_pool)
+                    return CoinSelection.from_utxo_pool(target_value, best_selection, utxo_pool)
             # Remove the excess value as we will be selecting different coins now
             current_waste -= (current_value - target_value)
             should_backtrack = True
@@ -91,7 +91,7 @@ def select_coins_branch_and_bound(utxo_pool: List[OutputGroup], target_value: in
 
     # Check for solution
     if len(best_selection) == 0:
-        return CoinSelection.algorithm_failure()
+        return CoinSelection.algorithm_failure(target_value)
 
     # Set output set
-    return CoinSelection.from_utxo_pool(best_selection, utxo_pool)
+    return CoinSelection.from_utxo_pool(target_value, best_selection, utxo_pool)

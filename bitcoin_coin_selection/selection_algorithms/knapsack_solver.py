@@ -46,9 +46,9 @@ def approximate_best_subset(utxo_pool: List[OutputGroup], target_value: int,
                         included[i] = False
 
     if reached_target:
-        return CoinSelection.from_utxo_pool(best_selection, utxo_pool)
+        return CoinSelection.from_utxo_pool(target_value, best_selection, utxo_pool)
     else:
-        return CoinSelection.algorithm_failure()
+        return CoinSelection.algorithm_failure(target_value)
 
 
 def select_coins_knapsack_solver(
@@ -64,7 +64,7 @@ def select_coins_knapsack_solver(
 
     for output_group in utxo_pool:
         if output_group.effective_value == target_value:
-            return CoinSelection([output_group])
+            return CoinSelection(target_value, [output_group])
 
         elif output_group.effective_value < target_value + MIN_CHANGE:
             applicable_groups.append(output_group)
@@ -74,10 +74,10 @@ def select_coins_knapsack_solver(
             lowest_larger = output_group
 
     if total_lower == target_value:
-        return CoinSelection(applicable_groups)
+        return CoinSelection(target_value, applicable_groups)
 
     if total_lower < target_value and lowest_larger:
-        return CoinSelection([lowest_larger])
+        return CoinSelection(target_value, [lowest_larger])
 
     # Solve subset sum by stochastic approximation
     utxo_pool.sort(reverse=True)
@@ -100,6 +100,6 @@ def select_coins_knapsack_solver(
             lowest_larger.effective_value <= best_selection.effective_value
         )
     ):
-        best_selection = CoinSelection([lowest_larger])
+        best_selection = CoinSelection(target_value, [lowest_larger])
 
     return best_selection
