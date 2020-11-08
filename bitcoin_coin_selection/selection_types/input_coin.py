@@ -6,6 +6,7 @@ class InputCoin():
     effective_value: int
     fee: int
     long_term_fee: int
+    address: str
 
     def __init__(self, tx_hash: str, vout: int, value: int, input_bytes: int):
         self.tx_hash = tx_hash

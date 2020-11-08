@@ -19,15 +19,12 @@ class OutputGroup():
     long_term_fee: int
     address: str
 
-    def __init__(self, outputs: List[InputCoin] = None, address: str = None):
-        self.effective_value = None
-        self.fee = None
-        self.long_term_fee = None
+    def __init__(self, address: str, outputs: List[InputCoin]):
         self.value = 0
+        self.address = address
         self.outputs = []
-        if outputs:
-            for output in outputs:
-                self.insert(output)
+        for output in outputs:
+            self.insert(output)
 
     def __gt__(self, output_group_2):
         return self.effective_value > output_group_2.effective_value
@@ -47,6 +44,9 @@ class OutputGroup():
                 self.effective_value += output.effective_value
                 non_negative_ev_outputs.append(output)
 
+        self.outputs = non_negative_ev_outputs
+
     def insert(self, output: InputCoin):
+        output.address = self.address
         self.outputs.append(output)
         self.value += output.value

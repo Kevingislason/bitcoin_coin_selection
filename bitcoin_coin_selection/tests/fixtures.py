@@ -21,7 +21,8 @@ def generate_utxo_pool():
                 value=int(amount),
                 input_bytes=100
             )
-            output_group = OutputGroup([input_coin])
+            fake_address = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+            output_group = OutputGroup(fake_address, [input_coin])
             output_group.set_fee(short_term_fee_per_byte,
                                  long_term_fee_per_byte)
             utxo_pool.append(output_group)
