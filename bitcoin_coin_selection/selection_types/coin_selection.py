@@ -31,7 +31,7 @@ class CoinSelection():
         if selected_output_groups:
             for output_group in selected_output_groups:
                 for output in output_group.outputs:
-                    self.insert(output_group)
+                    self.insert(output)
 
     @classmethod
     def insufficient_funds(cls):
