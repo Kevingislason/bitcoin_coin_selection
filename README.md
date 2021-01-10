@@ -1,10 +1,14 @@
 # bitcoin_coin_selection
 
-Port of Bitcoin core coin selection logic to Python <br>
+Port of Bitcoin core coin selection logic to Python, prioritizing fidelity to the original and convenience. <br>
+Classes / functions were named and organized per the original C++ code as far as was practicable. Most comments are copied.
 
 # Installation
 
 ```pip install bitcoin_coin_selection```
+
+# Usage
+``select_coins`` is the main interface here. See the exmples folder for a step-by-step walkthrough. <br>
 
 # Context
 
