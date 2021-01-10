@@ -32,6 +32,7 @@ def select_coins(utxo_pool: List[OutputGroup],
     # Calculate fees spending any given utxo would incur
     for outut_group in utxo_pool:
         outut_group.set_fee(short_term_fee_per_byte, long_term_fee_per_byte)
+
     # Calculate fee for the "fixed" part of a transaction
     fixed_fee = short_term_fee_per_byte * not_input_size_in_bytes
     target_after_fixed_fees = target_value + fixed_fee
@@ -42,7 +43,7 @@ def select_coins(utxo_pool: List[OutputGroup],
     if total_effective_value < target_after_fixed_fees:
         return CoinSelection.insufficient_funds_after_fees(target_value)
 
-    # Calculate cost of change (input to branch and bound)
+    # Calculate cost of making change (input to branch and bound)
     cost_of_creating_change = short_term_fee_per_byte * change_output_size_in_bytes
     cost_of_spending_change = long_term_fee_per_byte * change_spend_size_in_bytes
     cost_of_change = cost_of_creating_change + cost_of_spending_change
@@ -51,14 +52,17 @@ def select_coins(utxo_pool: List[OutputGroup],
     bnb_selection = select_coins_branch_and_bound(
         utxo_pool, target_after_fixed_fees, cost_of_change)
     if bnb_selection.outcome == CoinSelection.Outcome.SUCCESS:
-        return bnb_selection
+        selection = bnb_selection
     # Otherwise return knapsack_selection (less optimized) if possible
     else:
         knapsack_selection = select_coins_knapsack_solver(
             utxo_pool, target_after_fixed_fees
         )
         if knapsack_selection.outcome == CoinSelection.Outcome.SUCCESS:
-            return knapsack_selection
+            selection = knapsack_selection
         else:
             # If all else fails, return single random draw selection (not optomized) as a fallback
-            return select_coins_single_random_draw(utxo_pool, target_after_fixed_fees)
+            selection = select_coins_single_random_draw(utxo_pool, target_after_fixed_fees)
+
+    selection.set_change_value(cost_of_change)
+    return selection

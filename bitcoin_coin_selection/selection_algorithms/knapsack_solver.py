@@ -11,8 +11,16 @@ from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 DEFAULT_ITERATIONS = 1000
 
 
-def approximate_best_subset(utxo_pool: List[OutputGroup], target_value: int,
-                            total_lower: int, iterations: int) -> CoinSelection:
+def approximate_best_subset(utxo_pool: List[OutputGroup],
+                            target_value: int,
+                            total_lower: int,
+                            iterations: int,
+                            adjust_for_min_change: int = False
+    ) -> CoinSelection:
+
+    original_target_value = target_value
+    if adjust_for_min_change:
+        target_value += MIN_CHANGE
 
     best_selection = [True for output_group in utxo_pool]
     best_value = total_lower
@@ -46,9 +54,11 @@ def approximate_best_subset(utxo_pool: List[OutputGroup], target_value: int,
                         included[i] = False
 
     if reached_target:
-        return CoinSelection.from_utxo_pool(target_value, best_selection, utxo_pool)
+        return CoinSelection.from_utxo_pool(
+            original_target_value, best_selection, utxo_pool
+        )
     else:
-        return CoinSelection.algorithm_failure(target_value)
+        return CoinSelection.algorithm_failure(original_target_value)
 
 
 def select_coins_knapsack_solver(
@@ -86,7 +96,11 @@ def select_coins_knapsack_solver(
     )
     if best_selection.effective_value != target_value and total_lower >= target_value + MIN_CHANGE:
         best_selection = approximate_best_subset(
-            applicable_groups, target_value + MIN_CHANGE, total_lower, iterations
+            applicable_groups,
+            target_value,
+            total_lower,
+            iterations,
+            adjust_for_min_change=True
         )
     # If we have a bigger coin and (either the stochastic approximation didn't find
     # a good solution, or the next bigger coin is closer), return the bigger coin

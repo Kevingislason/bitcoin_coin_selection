@@ -18,3 +18,4 @@ class InputCoin():
         self.fee = self.input_bytes * short_term_fee_per_byte
         self.long_term_fee = self.input_bytes * long_term_fee_per_byte
         self.effective_value = self.value - self.fee
+        print("Input coin EV is: ", self.effective_value)

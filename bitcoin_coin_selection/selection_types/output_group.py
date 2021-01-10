@@ -43,8 +43,9 @@ class OutputGroup():
                 self.long_term_fee += output.long_term_fee
                 self.effective_value += output.effective_value
                 non_negative_ev_outputs.append(output)
-
         self.outputs = non_negative_ev_outputs
+
+
 
     def insert(self, output: InputCoin):
         output.address = self.address

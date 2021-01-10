@@ -20,8 +20,8 @@ class CoinSelection():
     target_value: int
     effective_value: int
     value: int
-    change_value: int
     fee: int
+    change_value: int
 
     def __init__(self,
                  target_value: int,
@@ -37,7 +37,6 @@ class CoinSelection():
             for output_group in selected_output_groups:
                 for output in output_group.outputs:
                     self.insert(output)
-        self.change_value = self.value - self.target_value - self.fee
 
     @classmethod
     def insufficient_funds(cls, target_value: int):
@@ -74,3 +73,11 @@ class CoinSelection():
         self.effective_value += output.effective_value
         self.value += output.value
         self.fee += output.fee
+
+    def set_change_value(self, cost_of_change: int):
+        change_value = max(self.effective_value - self.target_value, 0)
+        if change_value <= cost_of_change:
+            change_value = 0
+        self.change_value = change_value
+
+

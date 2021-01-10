@@ -18,6 +18,7 @@ def test_insufficient_funds_1(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.INSUFFICIENT_FUNDS
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_insufficient_funds_2(generate_utxo_pool):
@@ -26,6 +27,7 @@ def test_insufficient_funds_2(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.INSUFFICIENT_FUNDS
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_insufficient_funds_after_fees(generate_utxo_pool):
@@ -44,6 +46,7 @@ def test_insufficient_funds_after_fees(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.INSUFFICIENT_FUNDS_AFTER_FEES
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_invalid_spend(generate_utxo_pool):
@@ -58,6 +61,7 @@ def test_invalid_spend(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.INVALID_SPEND
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_success(generate_utxo_pool):
@@ -80,3 +84,69 @@ def test_success(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) > 0
     assert selection.effective_value >= 5 * CENT
+    assert selection.change_value > 0
+
+
+def test_does_not_make_dust_change(generate_utxo_pool):
+    short_term_fee_per_byte = 100
+    long_term_fee_per_byte = 100
+
+    utxo_pool = generate_utxo_pool(
+        [1 * CENT],
+        short_term_fee_per_byte,
+        long_term_fee_per_byte
+    )
+
+    not_input_size_in_bytes = 100
+    fixed_fee = short_term_fee_per_byte * not_input_size_in_bytes
+
+    total_effective_value = sum(output_group.effective_value for output_group in utxo_pool)
+
+    selection = select_coins(
+        utxo_pool=utxo_pool,
+        target_value=total_effective_value - fixed_fee - 1,
+        short_term_fee_per_byte=short_term_fee_per_byte,
+        long_term_fee_per_byte=long_term_fee_per_byte,
+        change_spend_size_in_bytes=100,
+        change_output_size_in_bytes=100,
+        not_input_size_in_bytes=not_input_size_in_bytes,
+    )
+
+    assert selection.outcome == CoinSelection.Outcome.SUCCESS
+    assert selection.change_value == 0
+
+
+def test_makes_slightly_larger_than_dust_change(generate_utxo_pool):
+    short_term_fee_per_byte = 100
+    long_term_fee_per_byte = 100
+    change_output_size_in_bytes = 100
+    change_spend_size_in_bytes = 100
+
+    utxo_pool = generate_utxo_pool(
+        [1 * CENT],
+        short_term_fee_per_byte,
+        long_term_fee_per_byte
+    )
+
+    not_input_size_in_bytes = 100
+    fixed_fee = short_term_fee_per_byte * not_input_size_in_bytes
+    cost_of_creating_change = short_term_fee_per_byte * change_output_size_in_bytes
+    cost_of_spending_change = long_term_fee_per_byte * change_spend_size_in_bytes
+    cost_of_change = cost_of_creating_change + cost_of_spending_change
+
+
+    total_effective_value = sum(output_group.effective_value for output_group in utxo_pool)
+
+    selection = select_coins(
+        utxo_pool=utxo_pool,
+        target_value=total_effective_value - fixed_fee - cost_of_change - 1,
+        short_term_fee_per_byte=short_term_fee_per_byte,
+        long_term_fee_per_byte=long_term_fee_per_byte,
+        change_spend_size_in_bytes=100,
+        change_output_size_in_bytes=100,
+        not_input_size_in_bytes=not_input_size_in_bytes,
+    )
+
+    assert selection.outcome == CoinSelection.Outcome.SUCCESS
+    assert selection.change_value == cost_of_change + 1
+

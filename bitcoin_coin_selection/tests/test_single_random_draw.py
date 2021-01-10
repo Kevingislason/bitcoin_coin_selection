@@ -16,6 +16,8 @@ def test_single_random_draw_failure_1(generate_utxo_pool):
         selection = select_coins_single_random_draw(
             utxo_pool, 100000 * CENT)
         assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
+        assert selection.effective_value == 0
+        assert selection.change_value == 0
 
 
 def test_single_random_draw_failure_2(generate_utxo_pool):
@@ -23,6 +25,8 @@ def test_single_random_draw_failure_2(generate_utxo_pool):
     selection = select_coins_single_random_draw(
         utxo_pool, 1)
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
+    assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_single_random_draw_success_1(generate_utxo_pool):
@@ -42,3 +46,4 @@ def test_single_random_draw_success_2(generate_utxo_pool):
 
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert selection.effective_value == 1 * CENT
+    assert selection.change_value == 0

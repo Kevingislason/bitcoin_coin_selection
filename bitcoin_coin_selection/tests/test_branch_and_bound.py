@@ -9,18 +9,8 @@ from bitcoin_coin_selection.selection_types.input_coin import InputCoin
 from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 from bitcoin_coin_selection.tests.fixtures import generate_utxo_pool, make_hard_case
 
-# todo: run tests with retries and repeats
-# todo: test cases for non-zero npon-input fees
 
-# How many times to run all the tests to have a chance to catch errors
-# that only show up with particular random shuffles
 RUN_TESTS = 100
-# Some tests fail 1% of the time due to bad luck.
-# We repeat those tests this many times and only complain if all iterations of the test fail
-RANDOM_REPEATS = 5
-
-DEFAULT_NOT_INPUT_FEES = 0
-
 
 @pytest.mark.parametrize("target_amount", [1 * CENT, 2 * CENT, 3 * CENT, 4 * CENT])
 def test_branch_and_bound_exact_match_single_coin(generate_utxo_pool, target_amount):
@@ -37,6 +27,7 @@ def test_branch_and_bound_exact_match_single_coin(generate_utxo_pool, target_amo
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 1
     assert selection.effective_value == target_amount
+    assert selection.change_value == 0
 
 
 def test_branch_and_bound_insufficient_funds(generate_utxo_pool):
@@ -53,6 +44,7 @@ def test_branch_and_bound_insufficient_funds(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 # Cost of change is greater than the difference between target value and utxo sum
@@ -70,6 +62,7 @@ def test_branch_and_bound_expensive_change(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 1
     assert selection.effective_value == 1 * CENT
+    assert selection.change_value == 0.1 * CENT
 
 
 # Cost of change is less than the difference between target value and utxo sum
@@ -86,6 +79,7 @@ def test_branch_and_bound_cheap_change_failure(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_branch_and_bound_exact_match_multiple_coins(generate_utxo_pool):
@@ -102,6 +96,7 @@ def test_branch_and_bound_exact_match_multiple_coins(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 3
     assert selection.effective_value == 10 * CENT
+    assert selection.change_value == 0
 
     selected_amounts = [
         output.effective_value for output in selection.outputs]
@@ -126,6 +121,7 @@ def test_branch_and_bound_failure_no_match(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
     assert selection.effective_value == 0
+    assert selection.change_value == 0
 
 
 def test_branch_and_bound_iteration_exhaustion(make_hard_case):
@@ -134,6 +130,7 @@ def test_branch_and_bound_iteration_exhaustion(make_hard_case):
         utxo_pool, target_value, 0)
     assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
     assert len(selection.outputs) == 0
+    assert selection.change_value == 0
 
     target_value, utxo_pool = make_hard_case(14)
     selection = select_coins_branch_and_bound(
@@ -156,6 +153,7 @@ def test_branch_and_bound_early_bailout_optimization(generate_utxo_pool):
     assert selection.outcome == CoinSelection.Outcome.SUCCESS
     assert len(selection.outputs) == 5
     assert selection.effective_value == 30 * CENT
+    assert selection.change_value == 0
 
 
 def test_branch_and_bound_consistently_fails_impossible_case(generate_utxo_pool):
@@ -168,3 +166,4 @@ def test_branch_and_bound_consistently_fails_impossible_case(generate_utxo_pool)
         assert selection.outcome == CoinSelection.Outcome.ALGORITHM_FAILURE
         assert len(selection.outputs) == 0
         assert selection.effective_value == 0
+        assert selection.change_value == 0
