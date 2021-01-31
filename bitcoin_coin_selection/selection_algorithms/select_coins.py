@@ -4,65 +4,36 @@ from bitcoin_coin_selection.selection_algorithms.branch_and_bound import select_
 from bitcoin_coin_selection.selection_algorithms.knapsack_solver import select_coins_knapsack_solver
 from bitcoin_coin_selection.selection_algorithms.single_random_draw import select_coins_single_random_draw
 from bitcoin_coin_selection.selection_types.change_constants import MAX_MONEY
-from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 from bitcoin_coin_selection.selection_types.coin_selection import (
     CoinSelection
 )
+from bitcoin_coin_selection.selection_types.coin_selection_params import (
+    CoinSelectionParams
+)
 
 
-def select_coins(utxo_pool: List[OutputGroup],
-                 target_value: int,
-                 short_term_fee_per_byte: int,
-                 long_term_fee_per_byte: int,
-                 change_output_size_in_bytes: int,
-                 change_spend_size_in_bytes: int,
-                 not_input_size_in_bytes: int
-                 ) -> CoinSelection:
+def select_coins(params: CoinSelectionParams) -> CoinSelection:
 
     # Validate target value isn't something silly
-    if target_value == 0 or target_value > MAX_MONEY:
-        return CoinSelection.invalid_spend(target_value)
+    if params.target_value == 0 or params.target_value > MAX_MONEY:
+        return CoinSelection.invalid_spend(params)
 
     # Check for insufficient funds
-    total_value = int(sum(
-        [output_group.value for output_group in utxo_pool]))
-    if total_value < target_value:
-        return CoinSelection.insufficient_funds(target_value)
+    if params.total_value < params.target_value:
+        return CoinSelection.insufficient_funds(params)
 
-    # Calculate fees spending any given utxo would incur
-    for outut_group in utxo_pool:
-        outut_group.set_fee(short_term_fee_per_byte, long_term_fee_per_byte)
-
-    # Calculate fee for the "fixed" part of a transaction
-    fixed_fee = short_term_fee_per_byte * not_input_size_in_bytes
-    target_after_fixed_fees = target_value + fixed_fee
-
-    # Check for insufficient funds after fees
-    total_effective_value = int(sum(
-        [output_group.effective_value for output_group in utxo_pool]))
-    if total_effective_value < target_after_fixed_fees:
-        return CoinSelection.insufficient_funds_after_fees(target_value)
-
-    # Calculate cost of making change (input to branch and bound)
-    cost_of_creating_change = short_term_fee_per_byte * change_output_size_in_bytes
-    cost_of_spending_change = long_term_fee_per_byte * change_spend_size_in_bytes
-    cost_of_change = cost_of_creating_change + cost_of_spending_change
+    if params.total_effective_value < params.target_value + params.fixed_fee:
+        return CoinSelection.insufficient_funds_after_fees(params)
 
     # Return branch and bound selection (more optimized) if possible
-    bnb_selection = select_coins_branch_and_bound(
-        utxo_pool, target_after_fixed_fees, cost_of_change)
+    bnb_selection = select_coins_branch_and_bound(params)
     if bnb_selection.outcome == CoinSelection.Outcome.SUCCESS:
-        selection = bnb_selection
+        return bnb_selection
     # Otherwise return knapsack_selection (less optimized) if possible
     else:
-        knapsack_selection = select_coins_knapsack_solver(
-            utxo_pool, target_after_fixed_fees
-        )
+        knapsack_selection = select_coins_knapsack_solver(params)
         if knapsack_selection.outcome == CoinSelection.Outcome.SUCCESS:
-            selection = knapsack_selection
+            return knapsack_selection
         else:
             # If all else fails, return single random draw selection (not optomized) as a fallback
-            selection = select_coins_single_random_draw(utxo_pool, target_after_fixed_fees)
-
-    selection.set_change_value(cost_of_change)
-    return selection
+            return select_coins_single_random_draw(params)

@@ -6,6 +6,7 @@ from bitcoin_coin_selection.selection_algorithms.select_coins import (
   select_coins
 )
 from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
+from bitcoin_coin_selection.selection_types.coin_selection_params import CoinSelectionParams
 from bitcoin_coin_selection.selection_types.output_group import OutputGroup
 from bitcoin_coin_selection.selection_types.input_coin import InputCoin
 import requests
@@ -144,13 +145,15 @@ long_term_fee_per_byte = short_term_fee_per_byte
 # 3 At this point we are ready to select coins; suppose we want to spend 150000 satoshis
 target_value = 150000
 coin_selection = select_coins(
-  utxo_pool,
-  target_value,
-  short_term_fee_per_byte,
-  long_term_fee_per_byte,
-  change_output_size_in_bytes,
-  change_spend_size_in_bytes,
-  not_input_size_in_bytes
+  CoinSelectionParams(
+    utxo_pool,
+    target_value,
+    short_term_fee_per_byte,
+    long_term_fee_per_byte,
+    change_output_size_in_bytes,
+    change_spend_size_in_bytes,
+    not_input_size_in_bytes
+  )
 )
 
 
